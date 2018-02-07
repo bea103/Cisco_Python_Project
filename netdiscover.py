@@ -15,6 +15,7 @@ class Device (object):
     os_version = ""
     management_ip_address = ""
     password = ""
+    management_ip =""
     modules = list()
     neighbors = list()
 
