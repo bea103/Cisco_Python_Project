@@ -13,6 +13,6 @@ The aim of this project is providing a solution to the following issue:
 4.	Designing a tool which will be able to report end of life/end of support for the available hardware/OS in the network. 
 
 For this purpose we have designed an graphic interface has been defined. The interface will look like this:
-#Photo
+# ![Logo](media/graphic_interface.png)
 
 
