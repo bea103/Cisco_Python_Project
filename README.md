@@ -17,12 +17,12 @@ For this purpose, we have designed an graphic interface. The interface will look
 
 First of all, is needed to attach two files (the path has to be the absolute one, name of the file included):
   1. The first file is <i>password.txt</i> (the name can not be changed). This file must contain all passwords of all          devices in the network. In order to be read properly, there must be just one password per line. A good example of a <i>password.txt</i> could be:
-  password1
-  password2
+  password1 <br>
+  password2 <br>
   password3
   
   2. The second file needed to run our application is the <i>iprange.txt</i> file (like the other one, the name can not be changed). This file must contain the iprange of the network plus the mask (all ips can be in the same line but separated by commas). The structure of this file must be like the following (ip/mask , ip2/mask2, etc...):
-  192.168.2.0/24, 192.168.3.0/24
+  <br>192.168.2.0/24, 192.168.3.0/24
   
   
 
