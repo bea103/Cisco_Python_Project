@@ -1,6 +1,6 @@
 # Cisco_Python_Project
 
-The aim of this project is providing a solution to the following issue:
+The aim of this project is providing a software solution to the following issues:
 
 1.	Knowing all available devices in the network. For each device, is needed to know:
   -	Hardware version.
