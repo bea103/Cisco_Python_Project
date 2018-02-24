@@ -29,7 +29,7 @@ After providing all the information above, we can run the application by clickin
 The application will start its scan of the network printing via console all the information related with the devices found. 
 An example of this output can be the following picture:
 
-# ![Console_output](media/console_output.png)
+# ![Console_output](media/console_output.PNG)
 
 In addition, the application will display a topology map through a GUI. This map will show all devices and all the connections with the other ones. It will also be possible to see the names of all used interfaces. This map will be similar to the following one:
 
