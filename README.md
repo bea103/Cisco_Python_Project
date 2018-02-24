@@ -12,6 +12,19 @@ The aim of this project is providing a software solution to the following issues
 3.	Seeing the interface description and interface status for each interface on each device. 
 4.	Designing a tool which will be able to report end of life/end of support for the available hardware/OS in the network. 
 
+To execute the program you just need to call the unique script, without need for arguments:
+# ![CallScript](media/execute.png)
+
+Be sure you have the following libraries in your computer:
+
+-ipaddress
+-paramiko
+-networkx
+-matploit
+-Tkinter
+-urllib
+-json
+
 For this purpose, we have designed a graphic interface. The interface will look like this:
 # ![Logo](media/graphic_interface.png)
 
