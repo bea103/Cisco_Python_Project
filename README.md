@@ -22,7 +22,7 @@ Be sure you have the following libraries in your computer:
   - networkx
   - matploit
   - Tkinter
-  - urllib
+  - urllib2
   - json
 
 For this purpose, we have designed a graphic interface. The interface will look like this:
