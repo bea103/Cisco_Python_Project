@@ -489,19 +489,26 @@ def startScan():
     device_list = []
     device_list=getValues()
 
-    #Get the End-of-life of the devices
     for i in device_list:
-        if i.serialNumber != "XXXXXXXXXXX" and len(i.serialNumber) == 11:
-            dates = getEOX(i.serialNumber)
-            i.EOX = dates[0]
+        SNumberList.append(i.serialNumber)
 
+
+    dates = getEOX(','.join(SNumberList))
+
+    """
+        Here we set the EOX for each device with the dates given by getEOX function.
+        However in most test enviroments all serial numbers will be the same (which shouldn't happend in real wordl), this will cause the API to return
+        a single date object, so to no cause an array out of bounds, there is a special case for all the serial numbers be the same.
+    """
+    for i in range(len(device_list)): 
+        if device_list[0].serialNumber == device_list[len(device_list)-1].serialNumber: 
+            device_list[i].EOX = dates[0] 
         else:
-            i.EOX = "Without data"
-
+            device_list[i].EOX = dates[i] 
     #Print the EOX
     print "################### EOX OF DEVICES #####################"
     for i in device_list:
-        print i.hostname[:len(i.hostname)-1] + ": " +i.EOX
+        print i.hostname+": "+i.EOX
 
 
     if(export.get()):           #If checked, export to a csv file.
@@ -547,12 +554,19 @@ def export_csv(new_device):
 
 def loadScan():
     global exportPath
+    exportPath = PathEntry.get()
+
+    if(export.get() and not exportPath):
+        print "Set a valid path to export file"
+        exit()
 
     exportPath = PathEntry.get()
     device_list = []
 
     with open(exportPath,'rb') as csvfile:
         reader = csv.DictReader(csvfile, delimiter =':')
+        print ""
+        print "_-/\-_ @@@ LOADED SCENARIO @@@ _-/\-_"
         for row in reader:
             new_device = Device()
             new_device.ip = row['management_ip_address']
