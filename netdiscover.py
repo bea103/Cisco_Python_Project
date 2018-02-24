@@ -212,13 +212,20 @@ def getValues():
         command = 'show running-config | include (ip domain-name|ip domain name)' # The aim of this command is show the configuration to get the hostname and the domain
         stdin, stdout, stderr= ssh_client.exec_command(command)
         
+        host_domain = ""
+
         for line in stdout.readlines():
             
             for match in re.finditer(regex_domain, line, re.MULTILINE):  # We apply the regex in every line    
-                host_domain = hostname[:len(hostname)-1] + "." + match.group('domain')
+                #host_domain = hostname[:len(hostname)-1] + "." + match.group('domain')
+                host_domain = match.group('domain')
             
         ssh_client.close()
         
+        if host_domain == "":
+            host_domain = hostname[:len(hostname)-1]
+        else:
+            host_domain = hostname[:len(hostname)-1] + "." + host_domain
         new_device.hostname = host_domain
             
         ssh_client.connect(hostname=i[0],
@@ -324,86 +331,6 @@ def getValues():
         #Add the device to the list
         device_list.append(new_device);
     return device_list
-#Function to print the network topology
-
-def print_topology(device_list):
-    
-    #Auxiliaries variables
-    i = 0
-    j = 0
-    interfaces = ""
-
-    #List to save the neighbors of a node
-    neighbors_id_single_list = list()
-    
-    #List to save all the neighbors
-    neighbors_id_multi_list = list()
-    neighbors_interface_list = list()
-    repeated_neig_list = list()
-
-    #Looking for repeated neighbors
-    for i in range(0,len(device_list)):
-        
-        repeated_neig_list = list()    
-        
-        #For each neighbors
-        for item in device_list[i].neighbors_id:  
-            pos = list()
-            position = 0
-            #looking for duplicated entries
-            for item2 in device_list[i].neighbors_id:
-                if item in item2:
-                    pos.append(position)
-                position += 1
-            #Save the position of each entry
-            repeated_neig_list.append(pos)
-
-        position = 0
-        for repeated in repeated_neig_list:
-            
-            
-            if len(repeated) == 1:
-                
-                len_hostname = len(device_list[i].hostname)    
-                neighbors_id_single_list.append(device_list[i].hostname[:len_hostname-1])
-                
-                neighbor_aux = device_list[i].neighbors_id[repeated[0]]
-                neighbors_id_single_list.append(neighbor_aux[:len(neighbor_aux)-1])
-                
-                #Create the list for the interface
-                neighbors_interface_list.append(device_list[i].if_to_neighbor_diagram[repeated[0]])
-                
-                neighbors_id_multi_list.append(neighbors_id_single_list)
-                #Clear the list
-                neighbors_id_single_list=list()
-            
-            else:
-             
-                for pos in repeated:
-                    if position != pos:
-                        interfaces += device_list[i].if_to_neighbor_diagram[pos] + "," 
-                
-                if position == max(repeated):
-                    
-                    len_hostname = len(device_list[i].hostname)
-                    neighbors_id_single_list.append(device_list[i].hostname[:len_hostname-1])
-                    
-                    neighbor_aux = device_list[i].neighbors_id[repeated[0]]
-                    neighbors_id_single_list.append(neighbor_aux[:len(neighbor_aux)-1])
-                    
-                    #Create the list for the interface
-                    neighbors_interface_list.append(interfaces[:len(interfaces)-1])
-                    neighbors_id_multi_list.append(neighbors_id_single_list)
-                    
-                    #Clear the list
-                    neighbors_id_single_list=list()
-            
-                    interfaces = ""    
-            
-            position += 1
-        
-    #Draw the topology with link's name
-    draw_network(neighbors_id_multi_list, neighbors_interface_list)
 
 #Function to print the network topology
 def print_topology(device_list):
@@ -439,11 +366,13 @@ def print_topology(device_list):
             repeated_neig_list.append(pos)
 
         position = 0
+        #For each neighbor of this device
         for repeated in repeated_neig_list:
             
-            
+            #Check if this neighbor isnt repeated
             if len(repeated) == 1:
                 
+                #Save the neighbor into a list
                 len_hostname = len(device_list[i].hostname)    
                 neighbors_id_single_list.append(device_list[i].hostname[:len_hostname-1])
                 
@@ -456,15 +385,19 @@ def print_topology(device_list):
                 neighbors_id_multi_list.append(neighbors_id_single_list)
                 #Clear the list
                 neighbors_id_single_list=list()
-            
+
+            #if the neighbors is repeated for this device
             else:
-             
+                
+                #Save all the interfaces by which this device is connected to the neighbor
                 for pos in repeated:
                     if position != pos:
                         interfaces += device_list[i].if_to_neighbor_diagram[pos] + "," 
                 
+                #Once we are in the last iteration
                 if position == max(repeated):
                     
+                    #Save all the information about this neighbor
                     len_hostname = len(device_list[i].hostname)
                     neighbors_id_single_list.append(device_list[i].hostname[:len_hostname-1])
                     
@@ -513,6 +446,7 @@ def draw_network(graph, labels=None, graph_layout='shell',
     nx.draw_networkx_labels(G, graph_pos,font_size=node_text_size,
                             font_family=text_font)
 
+    #Check the labels of the edges
     if labels is None:
         labels = range(len(graph))
     else:
@@ -555,25 +489,19 @@ def startScan():
     device_list = []
     device_list=getValues()
 
+    #Get the End-of-life of the devices
     for i in device_list:
-        SNumberList.append(i.serialNumber)
+        if i.serialNumber != "XXXXXXXXXXX" and len(i.serialNumber) == 11:
+            dates = getEOX(i.serialNumber)
+            i.EOX = dates[0]
 
-    dates = getEOX(','.join(SNumberList))
-
-    """
-        Here we set the EOX for each device with the dates given by getEOX function.
-        However in most test enviroments all serial numbers will be the same (which shouldn't happend in real wordl), this will cause the API to return
-        a single date object, so to no cause an array out of bounds, there is a special case for all the serial numbers be the same.
-    """
-    for i in range(len(device_list)): 
-        if device_list[0].serialNumber == device_list[len(device_list)-1].serialNumber: 
-            device_list[i].EOX = dates[0] 
         else:
-            device_list[i].EOX = dates[i] 
+            i.EOX = "Without data"
+
     #Print the EOX
     print "################### EOX OF DEVICES #####################"
     for i in device_list:
-        print i.hostname+": "+i.EOX
+        print i.hostname[:len(i.hostname)-1] + ": " +i.EOX
 
 
     if(export.get()):           #If checked, export to a csv file.
@@ -712,12 +640,14 @@ def getEOX(serialNumber):
 
     data = json.load(f)
     nresponses= len(data['EOXRecord'])
+    
     for i in data['EOXRecord']:
         if 'EOXError' in i:
             dates.append(i['EOXError']['ErrorDescription'])
         else:
             dates.append(i['LastDateOfSupport']['value'])
     time.sleep(60) #Stops the program for 60 seconds, so no overload the API's token
+    
     return dates
 
 
