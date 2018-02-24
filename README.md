@@ -17,13 +17,13 @@ To execute the program you just need to call the unique script, without need for
 
 Be sure you have the following libraries in your computer:
 
--ipaddress
--paramiko
--networkx
--matploit
--Tkinter
--urllib
--json
+  - ipaddress
+  - paramiko
+  - networkx
+  - matploit
+  - Tkinter
+  - urllib
+  - json
 
 For this purpose, we have designed a graphic interface. The interface will look like this:
 # ![Logo](media/graphic_interface.png)
