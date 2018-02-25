@@ -492,19 +492,28 @@ def startScan():
     for i in device_list:
         SNumberList.append(i.serialNumber)
 
+    print ','.join(SNumberList)
 
     dates = getEOX(','.join(SNumberList))
 
-    """
-        Here we set the EOX for each device with the dates given by getEOX function.
-        However in most test enviroments all serial numbers will be the same (which shouldn't happend in real wordl), this will cause the API to return
-        a single date object, so to no cause an array out of bounds, there is a special case for all the serial numbers be the same.
-    """
-    for i in range(len(device_list)): 
-        if device_list[0].serialNumber == device_list[len(device_list)-1].serialNumber: 
-            device_list[i].EOX = dates[0] 
+    #Get the End-of-life of the devices
+    for i in device_list:
+        if i.serialNumber != "XXXXXXXXXXX" and len(i.serialNumber) == 11:
+            dates = getEOX(i.serialNumber)
+            i.EOX = dates[0]
+
         else:
-            device_list[i].EOX = dates[i] 
+            i.EOX = "Without data"
+
+    """
+        Note: The optimum way to get the EOX of all the devices it's using the product ID to get more than one
+        EOX date for each call at the API, however, due that in simulation scenarios we can't get an appropiate 
+        PID, we can only use the serial number. The API summarizes the EOX results by product ID, so if we use
+        the serial number, in case that there are two or more devices with the same product ID, we can't know 
+        which EOX belongs to which device, so we only can make it through the Serial Number, and one at the time.
+        In real case scenarios, this wouldn't take much time as here.
+    """
+
     #Print the EOX
     print "################### EOX OF DEVICES #####################"
     for i in device_list:
