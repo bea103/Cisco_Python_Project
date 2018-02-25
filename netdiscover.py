@@ -544,7 +544,7 @@ def export_csv(new_device):
             model = i.model
             management_ip_address = i.ip
             password = i.password
-            hostname = i.hostname.replace("\r","")
+            hostname = i.hostname
             modules = i.modules
             EOX = i.EOX
             neighbors_id = i.neighbors_id
