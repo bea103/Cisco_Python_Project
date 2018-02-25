@@ -492,10 +492,6 @@ def startScan():
     for i in device_list:
         SNumberList.append(i.serialNumber)
 
-    print ','.join(SNumberList)
-
-    dates = getEOX(','.join(SNumberList))
-
     #Get the End-of-life of the devices
     for i in device_list:
         if i.serialNumber != "XXXXXXXXXXX" and len(i.serialNumber) == 11:
