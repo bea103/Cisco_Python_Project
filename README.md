@@ -26,7 +26,7 @@ Be sure you have the following libraries in your computer:
   - json
 
 For this purpose, we have designed a graphic interface. The interface will look like this:
-# ![Logo](media/graphic_interface.png)
+# ![Logo](media/graphic_interface.jpeg)
 
 First of all, is needed to attach two files (the path has to be the absolute one, name of the file included):
   1. The first file is <i>password.txt</i> (the name cannot be changed). This file must contain all passwords of all          devices in the network. In order to be read properly, there must be just one password per line. A good example of a <i>password.txt</i> could be:
