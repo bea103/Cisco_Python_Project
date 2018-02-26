@@ -637,8 +637,8 @@ def getEOX(serialNumber):
     dates = list()
 
     url='https://cloudsso.cisco.com/as/token.oauth2' #Url to obtain token for the API via OAuth2.0
-    clientid='wzxkkg83w8bgjp6kqg8p2eex'
-    clientsecret='GCY7NPUTMSMFpgtQCecpAdFj'
+    clientid=''
+    clientsecret=''
 
     """
         Now, make a Request object, call it, and load it's content into a json parser, which obtains the bearer acces token.
